@@ -1,25 +1,35 @@
-import { setupCounter } from './counter.ts';
+import * as THREE from 'three';
+import { randomHexColor } from './utils.ts';
+
 import './style.css';
 
-import typescriptLogo from './typescript.svg';
-import viteLogo from '/vite.svg';
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.outerWidth / window.outerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({canvas: <HTMLCanvasElement>document.querySelector('#background')});
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${ viteLogo }" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${ typescriptLogo }" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`;
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.outerWidth, window.outerHeight, false);
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!);
+const geometry = new THREE.TorusGeometry(7, 3, 20, 100);
+const material = new THREE.MeshBasicMaterial({color: 0x32CD32, wireframe: true});
+const torus = new THREE.Mesh(geometry, material);
+
+torus.position.setX(-8);
+torus.position.setY(6);
+
+scene.add(torus);
+
+window.onclick = (): void => {
+    torus.material.color = new THREE.Color(randomHexColor());
+    console.log(torus.material.color);
+}
+
+function renderScene(): void {
+    requestAnimationFrame(renderScene);
+
+    torus.rotateX(0.01);
+
+    renderer.render(scene, camera);
+}
+
+renderScene();
